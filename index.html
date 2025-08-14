@@ -137,28 +137,37 @@
   </div>
 
 <script>
-  // Liste deiner Bilder im Ordner 'images'
+  // ✅ Deine Bild-Dateien liegen NEBEN der HTML-Datei
   const images = [
-    "skiing.jpg",
-    "ageing.jpg",
-    "chillin.jpg",
-    "sippin.jpg",
+    "cuuttieee.jpg",
     "jumping.jpg",
-    "marching.jpg",
+    "sporting.jpg",
+    "ageing.jpg",
     "looking.jpg",
-    "cuuttieee.jpg"
+    "chinni.jpg",
+    "skiing.jpg"
   ];
 
   const grid = document.getElementById('grid');
-  images.forEach(name => {
+
+  function addTile(filename){
     const tile = document.createElement('div');
     tile.className = 'tile';
     const img = document.createElement('img');
-    img.src = 'images/' + name;
-    img.alt = name;
+
+    // Wichtig: ./ + encodeURI → funktioniert auch mit Leerzeichen/Sonderzeichen
+    img.src = './' + encodeURI(filename);
+    img.alt = filename;
+    img.loading = 'lazy';  // schnelleres Laden
+
+    // Falls ein Bild fehlt (404), Kachel ausblenden – verhindert hässliche Alt-Texte
+    img.onerror = () => { tile.remove(); };
+
     tile.appendChild(img);
     grid.appendChild(tile);
-  });
+  }
+
+  images.forEach(addTile);
 
   // Confetti
   const confetti = document.getElementById('confetti');
