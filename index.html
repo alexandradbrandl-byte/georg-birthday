@@ -46,8 +46,6 @@
       border:1px solid rgba(255,255,255,.08);
       padding:8px 14px;border-radius:999px;font-size:14px;
       box-shadow:0 6px 20px rgba(0,0,0,.25);
-      transform:scale(1);opacity:1;transition:.6s cubic-bezier(.2,.8,.2,1);
-      will-change:transform,opacity;
     }
     h1{margin:10px 0 6px;font-weight:650;letter-spacing:-.02em}
     .sub{color:var(--sub);max-width:58ch;margin:0 auto}
@@ -70,26 +68,16 @@
     }
     .btn:hover{transform:translateY(-1px);filter:brightness(1.02);background:var(--accent-dark)}
     .gallery{margin-top:20px}
-    .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
-    .hint{display:flex;gap:8px;color:var(--sub);font-size:13px;align-items:center}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    @media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
-    @media(min-width:840px){.grid{grid-template-columns:repeat(4,1fr)}}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
     .tile{aspect-ratio:4/3;background:#0b1b2a;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
     .tile img{width:100%;height:100%;object-fit:cover;display:block}
     .footer{display:flex;align-items:center;justify-content:space-between;color:var(--sub);font-size:12px;padding:0 32px 28px}
     .pill{display:inline-flex;gap:8px;align-items:center}
-    /* Mountains */ 
     .mountainLayer{position:absolute;left:0;right:0;bottom:0;height:220px;pointer-events:none}
-    /* Confetti */
     .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
     .confetti span{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:2px;opacity:0;transition:transform 1.4s ease-out, opacity 1.4s ease-out}
-    /* Footprints path */
     svg.footprints{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
     .path{fill:none;stroke:var(--accent);stroke-width:1.4;stroke-opacity:.18;stroke-dasharray:2 3}
-    /* Uploader hidden input */
-    input[type=file]{display:none}
-    .tip{color:var(--sub);text-align:center;font-size:13px;margin-top:14px}
   </style>
 </head>
 <body>
@@ -99,11 +87,10 @@
       <svg class="footprints" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path id="hikepath" class="path"
           d="M5,85 C25,55 55,95 95,15" />
-        <!-- footprints injected by JS -->
       </svg>
 
       <div class="p center">
-        <div class="badge" id="badge">✨ Georg wird 31 🎂</div>
+        <div class="badge">✨ Georg wird 31 🎂</div>
         <h1 style="font-size:clamp(28px,4vw,44px)">Happy Birthday, mein Speckpupsi cutie patootie 💙</h1>
         <p class="sub">Für unseren Wandertag: eine kleine Karte nur für dich – modern, ruhig, und voller Liebe.</p>
       </div>
@@ -129,16 +116,7 @@
         </div>
 
         <div class="gallery">
-          <div class="toolbar">
-            <div class="hint">🖼️ Füge eure PNGs hinzu (max. 8)</div>
-            <label class="btn" for="file">Bilder auswählen</label>
-            <input id="file" type="file" accept="image/png,image/jpeg" multiple />
-          </div>
-          <div id="grid" class="grid">
-            <div class="tile" id="emptyHint">
-              <img alt="" src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230b1b2a'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23b1c7c1' font-family='sans-serif' font-size='16'>Noch keine Bilder – lade Erinnerungen hoch 💚</text></svg>" />
-            </div>
-          </div>
+          <div id="grid" class="grid"></div>
         </div>
       </div>
 
@@ -149,7 +127,6 @@
 
       <div class="confetti" id="confetti"></div>
 
-      <!-- Mountains backdrop -->
       <svg class="mountainLayer" viewBox="0 0 1200 220" preserveAspectRatio="none">
         <path d="M0 170 L140 120 L260 155 L380 95 L520 165 L640 120 L770 160 L900 110 L1040 150 L1200 100 L1200 220 L0 220 Z"
               fill="#0a1b2a"></path>
@@ -157,15 +134,32 @@
               fill="#0c1f32"></path>
       </svg>
     </div>
-    <div class="tip">Tipp: Klicke auf <b>Feiern!</b> für Konfetti & um die Fußspuren zu pausieren/zu starten.</div>
   </div>
 
 <script>
-  // ---- Confetti ----
+  // Liste deiner Bilder im Ordner 'images'
+  const images = [
+    "hike1.jpg",
+    "hike2.jpg",
+    "hike3.jpg"
+  ];
+
+  const grid = document.getElementById('grid');
+  images.forEach(name => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    const img = document.createElement('img');
+    img.src = 'images/' + name;
+    img.alt = name;
+    tile.appendChild(img);
+    grid.appendChild(tile);
+  });
+
+  // Confetti
   const confetti = document.getElementById('confetti');
   function burstConfetti(){
-    const pieces = Array.from({length:24}, (_,i)=>i);
-    pieces.forEach(i=>{
+    const pieces = Array.from({length:24});
+    pieces.forEach(()=>{
       const el = document.createElement('span');
       const x = (Math.random() - 0.5) * 300;
       const y = (Math.random() - 0.2) * -300 - 80;
@@ -182,8 +176,7 @@
     });
   }
 
-  // ---- Footprints along a cubic Bezier path ----
-  const svg = document.querySelector('svg.footprints');
+  // Footprints
   const path = document.getElementById('hikepath');
   let t = 0, running = true;
   const footprints = [];
@@ -204,7 +197,7 @@
     right.setAttribute('x', '1');
     right.setAttribute('y', '-0.9');
     g.appendChild(left); g.appendChild(right);
-    svg.appendChild(g);
+    document.querySelector('svg.footprints').appendChild(g);
     footprints.push(g);
   }
   function step(){
@@ -222,33 +215,6 @@
   }
   step();
 
-  // ---- Upload preview ----
-  const input = document.getElementById('file');
-  const grid = document.getElementById('grid');
-  const emptyHint = document.getElementById('emptyHint');
-  input.addEventListener('change', (e)=>{
-    const files = Array.from(input.files || []).slice(0,8);
-    grid.innerHTML = '';
-    if(files.length === 0){
-      grid.appendChild(emptyHint);
-      return;
-    }
-    files.forEach((f,i)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        const tile = document.createElement('div');
-        tile.className='tile';
-        const img = document.createElement('img');
-        img.alt = 'Memory '+(i+1);
-        img.src = String(reader.result);
-        tile.appendChild(img);
-        grid.appendChild(tile);
-      };
-      reader.readAsDataURL(f);
-    });
-  });
-
-  // ---- Button actions ----
   document.getElementById('celebrateBtn').addEventListener('click', ()=>{
     burstConfetti();
     running = !running;
