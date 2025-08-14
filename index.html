@@ -7,8 +7,7 @@
   <meta name="description" content="Eine kleine, moderne Geburtstagskarte – in gedecktem Blau & Grün, mit Wander-Vibes." />
   <style>
     :root{
-      --base:#0b1523; --card:#0f2136; --accent:#7fbba9; --accent-dark:#5ea591;
-      --text:#e6f1ef; --sub:#b1c7c1;
+      --base:#0b1523; --card:#0f2136; --accent:#7fbba9; --accent-dark:#5ea591; --text:#e6f1ef; --sub:#b1c7c1;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -21,12 +20,8 @@
         linear-gradient(180deg, var(--base) 0%, var(--base) 100%);
     }
     .wrap{max-width:900px;margin:0 auto;padding:40px 20px;position:relative}
-    .card{
-      position:relative; background:rgba(15,33,54,.45);
-      border:1px solid rgba(255,255,255,.08); border-radius:28px;
-      box-shadow:0 20px 60px rgba(0,0,0,.35); overflow:hidden;
-    }
-    .frame:before{content:"";position:absolute;inset:0;border-radius:28px;pointer-events:none;outline:1px dashed rgba(255,255,255,.06);outline-offset:-10px}
+    .card{position:relative; background:rgba(15,33,54,.45); border:1px solid rgba(255,255,255,.08); border-radius:28px; box-shadow:0 20px 60px rgba(0,0,0,.35); overflow:hidden;}
+    .frame:before{content:"";position:absolute;inset:0;border-radius:28px;pointer-events:none; outline:1px dashed rgba(255,255,255,.06);outline-offset:-10px}
     .p{padding:32px} .center{text-align:center}
     .badge{display:inline-flex;gap:8px;align-items:center;background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.08);padding:8px 14px;border-radius:999px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
     h1{margin:10px 0 6px;font-weight:650;letter-spacing:-.02em}
@@ -40,7 +35,6 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
     .tile{aspect-ratio:4/3;background:#0b1b2a;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);position:relative}
     .tile img{width:100%;height:100%;object-fit:cover;display:block}
-    .err{position:absolute;inset:auto 8px 8px 8px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 8px;font-size:12px;color:#fca5a5}
     .footer{display:flex;align-items:center;justify-content:space-between;color:var(--sub);font-size:12px;padding:0 32px 28px}
     .pill{display:inline-flex;gap:8px;align-items:center}
     .mountainLayer{position:absolute;left:0;right:0;bottom:0;height:220px;pointer-events:none}
@@ -82,7 +76,16 @@
         </div>
 
         <div class="gallery">
-          <div id="grid" class="grid"></div>
+          <div class="grid">
+            <!-- *** statische Bilder, liegen NEBEN der HTML-Datei *** -->
+            <div class="tile"><img src="./cuuttieee.jpg" alt="cuuttieee" onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./jumping.jpg"   alt="jumping"   onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./sporting.jpg"  alt="sporting"  onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./ageing.jpg"    alt="ageing"    onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./looking.jpg"   alt="looking"   onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./chinni.jpg"    alt="chinni"    onerror="this.parentElement.style.display='none'"></div>
+            <div class="tile"><img src="./skiing.jpg"    alt="skiing"    onerror="this.parentElement.style.display='none'"></div>
+          </div>
         </div>
       </div>
 
@@ -101,76 +104,7 @@
   </div>
 
 <script>
-  // <<< Trage hier nur die BASISNAMEN ein – OHNE Endung >>>
-  const baseNames = [
-    "cuuttieee",
-    "jumping",
-    "sporting",
-    "ageing",
-    "looking",
-    "chinni",
-    "skiing"
-  ];
-
-  // Der Loader probiert automatisch verschiedene Endungen & Pfade
-  const exts = [".jpg",".jpeg",".JPG",".JPEG",".png",".webp"];
-  const dirs = ["./","./images/"]; // unterstützt beides: neben HTML oder im images/-Ordner
-
-  const grid = document.getElementById('grid');
-
-  function makeTile(label){
-    const tile = document.createElement('div');
-    tile.className = 'tile';
-    const msg = document.createElement('div');
-    msg.className = 'err';
-    msg.textContent = `Lade: ${label} …`;
-    tile.appendChild(msg);
-    grid.appendChild(tile);
-    return tile;
-  }
-
-  function tryNext(imgEl, tile, candidates, label){
-    if (candidates.length === 0) {
-      const err = tile.querySelector('.err');
-      if (err) err.textContent = `Bild nicht gefunden: ${label}`;
-      console.warn("Bild nicht gefunden:", label);
-      return;
-    }
-    const next = candidates.shift();
-    imgEl.onerror = () => {
-      // Nächsten Kandidaten probieren
-      tryNext(imgEl, tile, candidates, label);
-    };
-    imgEl.onload = () => {
-      // Erfolgreich: Fehlertext entfernen und Bild zeigen
-      const err = tile.querySelector('.err');
-      if (err) err.remove();
-      tile.appendChild(imgEl);
-    };
-    // Cache-Busting hängt ?v= Zeit an (hilft bei GitHub Pages)
-    imgEl.src = next + (next.includes('?') ? '&' : '?') + 'v=' + Date.now();
-  }
-
-  function addSmartImage(base){
-    // Kachel anlegen
-    const tile = makeTile(base);
-    const img = document.createElement('img');
-    img.alt = base;
-
-    // Alle Kombinationen vorbereiten
-    const candidates = [];
-    for (const d of dirs) {
-      for (const e of exts) {
-        candidates.push(d + encodeURI(base + e));
-      }
-    }
-    tryNext(img, tile, candidates, base);
-  }
-
-  // Starte den robusten Loader
-  baseNames.forEach(addSmartImage);
-
-  // Confetti
+  // Konfetti (optional)
   const confetti = document.getElementById('confetti');
   function burstConfetti(){
     const pieces = Array.from({length:24});
@@ -191,7 +125,7 @@
     });
   }
 
-  // Footprints
+  // Fußspuren
   const path = document.getElementById('hikepath');
   let t = 0, running = true;
   const footprints = [];
@@ -201,16 +135,11 @@
     const left = document.createElementNS('http://www.w3.org/2000/svg','rect');
     const right = document.createElementNS('http://www.w3.org/2000/svg','rect');
     [left,right].forEach(r=>{
-      r.setAttribute('width','2.8');
-      r.setAttribute('height','2');
-      r.setAttribute('rx','0.8');
-      r.setAttribute('fill','var(--accent)');
-      r.setAttribute('fill-opacity','0.5');
+      r.setAttribute('width','2.8'); r.setAttribute('height','2'); r.setAttribute('rx','0.8');
+      r.setAttribute('fill','var(--accent)'); r.setAttribute('fill-opacity','0.5');
     });
-    left.setAttribute('x', '-2.8');
-    left.setAttribute('y', '-1');
-    right.setAttribute('x', '1');
-    right.setAttribute('y', '-0.9');
+    left.setAttribute('x', '-2.8'); left.setAttribute('y', '-1');
+    right.setAttribute('x', '1');    right.setAttribute('y', '-0.9');
     g.appendChild(left); g.appendChild(right);
     document.querySelector('svg.footprints').appendChild(g);
     footprints.push(g);
@@ -230,7 +159,7 @@
   }
   step();
 
-  document.getElementById('celebrateBtn')?.addEventListener('click', ()=>{
+  document.getElementById('celebrateBtn').addEventListener('click', ()=>{
     burstConfetti();
     running = !running;
   });
